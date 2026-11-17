@@ -1,0 +1,16 @@
+# Gradle / 构建产物
+.gradle/
+build/
+app/build/
+*.iml
+.idea/
+
+# 本机路径（每台机器不同，不入库）
+local.properties
+
+# 安装包走 GitHub Releases，不进仓库
+dist/
+
+# 日志与临时文件
+*.log
+*.hprof

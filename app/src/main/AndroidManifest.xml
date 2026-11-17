@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        唯一的网络用途：在设置页里登录你自己的 Bitwarden 服务器拉取条目。
+        应用里没有其他任何联网代码，也没有分析/统计/广告 SDK。
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 指纹/人脸解锁：只用来授权 AndroidKeyStore 里的那把本地密钥 -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+
+    <application
+        android:usesCleartextTraffic="true"
+        android:name=".MiniVaultApp"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="false"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MiniVault">
+
+        <activity
+            android:name=".ui.MainActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden|uiMode"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 自动填充认证入口：锁定时系统拉起它，解锁后回填 -->
+        <activity
+            android:name=".autofill.AutofillAuthActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden|uiMode"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- 保存确认页：网页提交新的账号密码后，问要不要存进密码库 -->
+        <activity
+            android:name=".autofill.AutofillSaveActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden|uiMode"
+            android:exported="false"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- 密码自动填充服务：让 MiniVault 出现在系统「密码自动填充」列表里 -->
+        <service
+            android:name=".autofill.VaultAutofillService"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_AUTOFILL_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.autofill.AutofillService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.autofill"
+                android:resource="@xml/autofill_service" />
+        </service>
+
+        <!-- 凭据提供者（Android 14+）：让 MiniVault 出现在「密码自动填充与通行密钥服务」里 -->
+        <service
+            android:name=".autofill.MiniVaultCredentialProvider"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_CREDENTIAL_PROVIDER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.credentials.CredentialProviderService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.credentials.provider"
+                android:resource="@xml/credential_provider" />
+        </service>
+    </application>
+
+</manifest>
